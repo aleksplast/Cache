@@ -76,16 +76,13 @@ private:
             }
         }
 
-        if (element != next_element) {
-            cache.insert(next_element, *element);
-            cache.erase(element);
-        }
+        cache.splice(next_element, cache, element);
     }
 
 public:
 
-    void get_hit_counts() const {
-        std::cout << total_hits << '\n';
+    size_t get_hit_counts() const {
+        return total_hits;
     }
 };
 

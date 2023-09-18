@@ -17,7 +17,7 @@ int main() {
         cache.lookup_update(elem);
     }
 
-    cache.get_hit_counts();
+    std::cout << cache.get_hit_counts() << '\n';
 
     return 1;
 }
