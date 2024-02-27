@@ -1,6 +1,7 @@
 #ifndef LFU_HPP
 #define LFU_HPP
 
+#include <algorithm>
 #include <iterator>
 #include <unordered_map>
 #include <list>
@@ -52,13 +53,13 @@ public:
 private:
     void add_new_elem(key_t key) {
         if (full) {
-            auto delete_elem = std::prev(cache.end());
-            cache.erase(delete_elem);
+            auto delete_elem = cache.begin();
             hash.erase(delete_elem->key);
+            cache.erase(delete_elem);
         }
 
         cache.emplace_front(key);
-        hash[key] = std::next(cache.end());
+        hash[key] = cache.begin();
 
         if (!full && cache.size() == capacity)
             full = true;
@@ -68,13 +69,11 @@ private:
         total_hits++;
         list_iter element = hit->second;
         element->frequency++;
-        list_iter next_element = element;
+        size_t frequency = element->frequency;
 
-        for (; next_element != cache.begin(); next_element++) {
-            if (element->frequency < next_element->frequency) {
-                break;
-            }
-        }
+        list_iter next_element = std::find_if(element, cache.end(), [&](lfu_elem elem) {
+            return elem.frequency > frequency;
+        });
 
         cache.splice(next_element, cache, element);
     }

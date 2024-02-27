@@ -41,7 +41,9 @@ private:
     std::unordered_set<key_t> elem_set;
 
 public:
-    perfect_cache(size_t capacity, size_t input_num) : capacity(capacity), input_num(input_num) {};
+    perfect_cache(size_t capacity, size_t input_num) : capacity(capacity), input_num(input_num) {
+        input.reserve(input_num);
+    };
 
     void run_cache() {
         fill_input();
@@ -49,28 +51,28 @@ public:
         fill_hashmap();
 
         for (auto curr = input.begin(); curr != input.end(); curr++) {
-            lookup_update(curr);
+            lookup_update(*curr);
         }
     }
 
-    size_t get_total_hits() {
+    size_t get_total_hits() const {
         return total_hits;
     }
 
 private:
 
-    void lookup_update(input_iter key) {
-        auto elem = elem_set.find(*key);
+    void lookup_update(key_t& key) {
+        auto elem = elem_set.find(key);
 
         if (elem == elem_set.end()) {
-            add_new_elem(*key);
+            add_new_elem(key);
         } else {
             total_hits++;
         }
 
-        hashmap[*key].pop_front();
-        if (hashmap[*key].empty()) {
-            hashmap.erase(*key);
+        hashmap[key].pop_front();
+        if (hashmap[key].empty()) {
+            hashmap.erase(key);
         }
     }
 
@@ -123,6 +125,10 @@ private:
         for (int i = 0; i < input_num; i++) {
             key_t elem;
             std::cin >> elem;
+
+            if (!std::cin.good())
+                throw std::runtime_error("Invalid input");
+
             input.push_back(elem);
         }
     }
